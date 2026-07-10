@@ -55,6 +55,7 @@ def verify_structure(*, verbose: bool = False) -> list[str]:
     issues: list[str] = []
 
     required_files = [
+        "README.md",
         "AGENTS.md",
         "METHODOLOGY.md",
         "agents/README.md",
