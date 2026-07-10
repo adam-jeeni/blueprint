@@ -67,51 +67,144 @@ approves, corrects, and guides — but never starts from a blank page.
 
 ---
 
-## 3. The CLI: Methodology as Product
+## 3. Getting Started
 
-The biggest change from v3. The methodology is no longer a process you read about — it's a command
-you run.
+This section takes you from zero to your first feature. If you have an existing project without the
+blueprint structure, start at "Onboarding an Existing Project." If you're starting fresh, begin here.
 
-### `blueprint init` — Greenfield
-```
-blueprint init my-project --name "My App" --stack "python-3.12,fastapi" --context "B2B SaaS"
-```
-Creates the full convention structure: AGENTS.md, METHODOLOGY.md, agents/ (10 prompts), docs/
-(5 standing docs), specs/_template/, specs/README.md, src/, tests/, pyproject.toml. Every .md file
-has headings and explanatory text in every section. Open with any AI agent — AGENTS.md routes it
-into the feature lifecycle.
+### Installation
 
-### `blueprint onboard` — Brownfield
+```bash
+# Clone the repository
+git clone https://github.com/YOUR_USERNAME/blueprint.git
+cd blueprint
+
+# Create and activate a virtual environment
+python -m venv .venv
+source .venv/bin/activate      # Linux / macOS
+.venv\Scripts\activate         # Windows
+
+# Install in editable mode
+pip install -e .
 ```
-cd existing-project
+
+Verify it works:
+
+```bash
+blueprint --help
+```
+
+You should see four subcommands: `init`, `onboard`, `new-feature`, `verify`.
+
+### Your First Project
+
+```bash
+blueprint init my-project \
+  --name "My Application" \
+  --stack "python-3.12,fastapi,postgresql" \
+  --context "B2B SaaS platform for UK SMEs"
+```
+
+This creates a fully scaffolded project directory. Every `.md` file has headings and explanatory
+text in every section. The folder structure is the convention — no configuration needed.
+
+Open the project with any AI agent. It reads `AGENTS.md` first, detects that the convention is in
+place (scenario 3), reads the standing documents in `docs/`, and enters the normal feature lifecycle.
+
+### Onboarding an Existing Project
+
+Got an existing codebase with no convention structure? Run this from your project root:
+
+```bash
+cd my-existing-project
 blueprint onboard
 ```
-Scaffolds the convention skeleton around your existing code. Creates AGENTS.md, METHODOLOGY.md,
-agents/, docs/, specs/ — without touching a single source file. Then open with an AI agent:
-AGENTS.md detects scenario 2, reverse-engineers standing docs from your codebase, and presents
-them for your approval.
 
-### `blueprint new-feature` — Start a Feature
-```
-blueprint new-feature add-export
-```
-Reads specs/README.md, assigns the next feature number, copies specs/_template/ into
-specs/NNN-add-export/, updates the index. Your feature folder is ready — edit the numbered
-files in order, with the Architecture Advisor helping at every step.
+The CLI detects your source files (`.py`, `.js`, `.ts`, etc.), creates the convention skeleton
+around them — `AGENTS.md`, `METHODOLOGY.md`, `agents/`, `docs/`, `specs/` — and stops. It never
+touches your existing source files.
 
-### `blueprint verify` — CI Gate
+Now open the project with an AI agent. `AGENTS.md` detects scenario 2. The agent uses the
+Brownfield Onboarding prompt to reverse-engineer standing documents from your actual code. It reads
+your modules, identifies components and layers, builds the known-callers register from actual
+imports, and presents the populated docs for your approval. Once you approve, your project is
+convention-compliant and enters scenario 3.
+
+### The Architecture Advisor
+
+Now you have a convention-compliant project. Before you write any spec, meet your design partner.
+
+Tell your AI agent:
+
+> "Load the Architecture Advisor prompt from `agents/prompts/architecture-advisor.md`."
+
+The advisor introduces itself and asks what you're working on. Describe your idea in plain language.
+The advisor:
+
+- **Asks questions, not gives answers.** "Who experiences this problem? What would 'done' look like?"
+- **Checks the known-callers register.** If your idea touches an existing component, the advisor asks
+  who else calls it and whether they'll break.
+- **Filters production history.** Reads `docs/production-feedback.md` for past incidents in the
+  same layer — warns you about edge cases that bit someone else.
+- **Reads only what's relevant.** A frontend-only change? The advisor reads `user-guide.md` and
+  `project-overview.md`, not `data-dictionary.md`. Token-efficient by design.
+- **Knows the templates cold.** Mentally checks your thinking against every section of the relevant
+  template and flags gaps without you needing to open the template file.
+
+The advisor doesn't produce final documents, delegate to other agents, or override your decisions.
+It's a thinking partner. When you're ready, you dismiss it and the orchestrator takes over.
+
+### Your First Feature
+
+With your idea clarified by the advisor, create the feature folder:
+
+```bash
+blueprint new-feature add-user-export
 ```
-blueprint verify
-```
-Checks every required file and directory exists. Checks the known-callers register against
-actual code imports. Checks standing doc section headings. Pass (exit 0) or a drift report
-(exit non-zero). Safe for CI — read-only, never modifies files.
+
+This reads `specs/README.md`, assigns the next feature number, copies the template files into
+`specs/NNN-add-user-export/`, and updates the index. Now open the numbered files in order:
+
+1. **`1-problem-statement.md`** — what needs to change and why. The advisor helps you scope it.
+2. **`2-solution-design.md`** — the contract implementation agents will follow. The advisor walks
+   you through interface contracts, failure modes, and rollback.
+3. **`3-backlog.md`** — sequenced tasks with a parallelisation map. (Skippable — check `SKIP-RUBRIC.md`.)
+4. **`4-test-spec.md`** — test cases traced to success criteria. (Skippable.)
+
+The human approval gate sits between steps 1 and 2. You approve the problem statement before
+design work begins. After step 4, the orchestrator delegates implementation to the appropriate
+agents (schema, backend, frontend), the review agent runs the full test suite and doc verification
+gate, and the spec agent updates the standing documents.
+
+### Who Touches What
+
+Not every document is for you. Not every document is for the AI. Here's the split:
+
+| Document | Human | Architecture Advisor | Orchestrator / Agents | Purpose |
+|---|---|---|---|---|
+| `AGENTS.md` | — | reads once | reads every session | Lifecycle engine + scenario detection |
+| `METHODOLOGY.md` | — | reads once | reads on demand | Template reference — what goes in every section |
+| `docs/architecture.md` | — | reads (if relevant) | reads (step 2) | Components, layers, known callers |
+| `docs/data-dictionary.md` | — | reads (if relevant) | reads (step 2) | Entities, fields, ownership |
+| `docs/user-guide.md` | — | reads (if relevant) | reads (step 2) | Current user-facing behaviour |
+| `docs/project-overview.md` | — | reads always | reads (step 2) | Business context, stack |
+| `docs/production-feedback.md` | — | reads (filtered by layer) | reads (step 2) | Past incidents and preventions |
+| `specs/README.md` | — | — | reads + writes | Feature index |
+| `1-problem-statement.md` | **writes** (with advisor) | helps draft | fills template | What needs to change |
+| `2-solution-design.md` | **writes** (with advisor) | helps draft | fills template | How it will be built |
+| `3-backlog.md` | writes (or skips) | — | fills template | Sequenced tasks |
+| `4-test-spec.md` | writes (or skips) | — | fills template | Test cases |
+| `SKIP-RUBRIC.md` | — | knows from prompt | reads | Whether to skip 3 and 4 |
+
+In practice, most of the "human writes" work is done conversationally with the Architecture
+Advisor. You describe the idea; the advisor asks the right questions; together you produce a
+solid draft. The human approves. The orchestrator handles the rest.
 
 ---
 
 ## 4. The Agent Hierarchy
 
-Ten roles, not four. Here's how they fit together.
+Ten roles. Here's how they fit together.
 
 ### Human-Facing
 
@@ -119,14 +212,12 @@ Ten roles, not four. Here's how they fit together.
 describe the idea in plain language. The advisor asks the right questions, spots gaps in your
 design, checks the known-callers register for impact, and filters production-feedback for
 relevant past incidents. It reads only the standing docs relevant to your feature — not all five.
-It never produces final documents, delegates to sub-agents, or overrides your decisions. You
-invoke it; you dismiss it; the orchestrator takes over when you're ready.
+It never produces final documents, delegates to sub-agents, or overrides your decisions.
 
 ### Lifecycle Coordination
 
 **Orchestrator** — Runs the full feature lifecycle. Copies templates, fills in specs, delegates
-to implementation agents, integrates results, coordinates review. The orchestrator is the
-operational layer between human approval and shipped code.
+to implementation agents, integrates results, coordinates review.
 
 ### Implementation (Horizontal)
 
@@ -185,98 +276,52 @@ project-root/
 Three load-bearing design decisions:
 
 1. **docs/ is feature-independent.** Every feature's step 2 reads these; no single feature owns them.
-   The known-callers register in architecture.md makes brownfield impact analysis possible.
-
 2. **specs/ folder numbers match git branch names.** feature/003-... matches specs/003-.../.
-   Collision-proofing that matters once features run in parallel worktrees.
-
 3. **test-spec.md specifies tests; tests/ holds the generated code.** They are distinct artifacts.
-   The review agent checks the latter against the former — they are not the same thing.
 
 ---
 
-## 6. The Three Entry Points
-
-### Greenfield — New Project, Empty Folder
-
-```bash
-blueprint init my-app --name "My App" --stack "python-3.12,fastapi,postgresql" --context "B2B SaaS platform"
-```
-
-Result: a fully scaffolded project. Open with any AI agent. AGENTS.md detects the convention
-is in place (scenario 3). Read the standing docs. Start feature 001.
-
-### Brownfield — Existing Code, Foreign Structure
-
-```bash
-cd my-existing-project
-blueprint onboard
-```
-
-The CLI detects your source files, creates the convention skeleton around them, and stops. Then
-you open the project with an AI agent. AGENTS.md detects scenario 2. The agent reverse-engineers
-architecture.md, data-dictionary.md, user-guide.md, and project-overview.md from your actual
-code — not guesses, not templates. It presents them for your approval. Once you approve, the
-project is convention-compliant and enters scenario 3.
-
-### Brownfield — Already Convention-Compliant
-
-The agent reads AGENTS.md, detects scenario 3, reads the standing docs, and enters the normal
-feature lifecycle. This is the steady state — every feature after the first one.
-
----
-
-## 7. Token Efficiency
+## 6. Token Efficiency
 
 The methodology's templates and documents are read by multiple agents across every feature.
 Small savings per read compound into significant reductions over a project's lifetime.
 
 ### Comment stripping
-Template files (1-problem-statement.md through 4-test-spec.md) were 6KB with explanatory
-comments. Now they're 2KB of headings and field names only. All explanation lives in
-METHODOLOGY.md — read once per session, not repeated in every template read by every agent.
-Saving: ~4KB per template set, read by 2-3 agents per feature.
+Template files were 6KB with explanatory comments. Now they're 2KB of headings and field names
+only. All explanation lives in `METHODOLOGY.md` — read once per session, not repeated in every
+template read by every agent.
 
 ### Scoped standing doc reads
 The Architecture Advisor reads only the standing docs relevant to the current feature's layers.
-A frontend-only change reads user-guide.md and project-overview.md — two docs, not five.
-Saving: ~4KB per feature.
+A frontend-only change reads two docs, not five.
 
 ### Layer-filtered production feedback
-The production-feedback.md incident table has a Layer column. The advisor filters by the current
-feature's layers — skips datastore incidents for a frontend change.
-Saving: grows with the incident log.
+`production-feedback.md` has a `Layer` column. The advisor filters by the feature's layers.
 
 ### Skip-rubric encoded in the prompt
-The advisor knows the five skip-rubric conditions from its prompt. SKIP-RUBRIC.md stays for
-agents that need it; the advisor skips reading it.
-Saving: ~1.7KB per feature.
+The advisor knows the five criteria from its prompt. No separate file read needed.
 
 ### Two-document model
-METHODOLOGY.md is the agent reference — 12KB of template guidance, lifecycle detail, and
-conventions. Read once per session by the advisor and orchestrator. The PDF you're reading
-now is for humans. Each document serves one audience; neither duplicates the other.
+`METHODOLOGY.md` is the agent reference — read once per session. This PDF is for humans.
+Each document serves one audience; neither duplicates the other.
 
 ---
 
-## 8. Worked Example: Country Collection Conversation Threading
+## 7. Worked Example: Country Collection Conversation Threading
 
 The Country Collection pipeline handles inbound customer enquiries across email, chat, and
-contact form. Each message is classified, handled by a specialist agent, and drafted into a
-reply for human review. The problem: replies to existing conversations were creating new
-threads in Outlook rather than continuing the original thread. The customer saw fragmented
-conversations; the operator couldn't trace the full history.
+contact form. The problem: replies to existing conversations were creating new threads in
+Outlook rather than continuing the original thread.
 
 ### How the workflow looked with blueprint
 
 **Step 0 — The operator describes the problem to the Architecture Advisor.**
 
 The advisor asks: "When an email comes in, how does the system determine if it's a reply or a
-new enquiry? What field would you use to link it to an existing thread?" The operator explains
-the Outlook conversation ID. The advisor checks the known-callers register in architecture.md:
-`crm.py: find_conversation()` is currently only called by `email_poller.py`. "If we use this for
-chat and contact form too," the advisor asks, "are those callers prepared for the not-found path?"
-The operator confirms: yes, they'll need to handle it — add that to the acceptance criteria.
+new enquiry?" The operator explains the Outlook conversation ID. The advisor checks the
+known-callers register: `crm.py: find_conversation()` is currently only called by `email_poller.py`.
+"If we use this for chat and contact form too," the advisor asks, "are those callers prepared
+for the not-found path?"
 
 **Step 1 — Problem statement drafted.**
 
@@ -285,91 +330,69 @@ The operator and advisor produce the problem statement: what needs to change, su
 
 **Step 2 — Solution design.**
 
-The solution touches backend and data layers. The advisor walks through the template sections:
-interface contracts for the threading endpoint, impact on crm.py (shared component — must preserve
-existing callers), failure modes (what if Outlook is down? what if the thread ID is malformed?),
-rollback plan.
+Interface contracts for the threading endpoint, impact on crm.py (shared component), failure
+modes (Outlook down, malformed thread ID), rollback plan.
 
 **Step 3 — Backlog.**
 
-Four tasks: add conversation_id to the normalisation pipeline, thread lookup in crm.py, wire
-email_poller to use it, wire chat and contact-form handlers. Backend tasks 1 and 2 run in
-parallel; 3 and 4 depend on them but can run concurrently with each other.
+Four tasks: add conversation_id to normalisation, thread lookup in crm.py, wire email_poller,
+wire chat and contact-form handlers. Backend tasks 1 and 2 run in parallel.
 
 **Step 4 — Test spec.**
 
-Acceptance criteria trace: every success criterion maps to a test. Edge cases: malformed thread
-ID, missing conversation, concurrent replies to the same thread. Regression tests: existing
-email-only threading still works; crm.py's existing callers are unharmed.
+Edge cases: malformed thread ID, missing conversation, concurrent replies. Regression tests:
+existing email-only threading still works.
 
 **Steps 5-7 — Implementation, review, doc update.**
 
-The orchestrator delegates tasks per the parallelisation map. Schema agent handles the migration
-(adding an index on conversation_id). Backend agent implements the thread-lookup service. Review
-agent runs the full test suite, verifies the known-callers register was updated, and approves.
-Spec agent updates architecture.md and user-guide.md.
-
-The feature shipped. The customer's conversations thread correctly. The known-callers register
-now has accurate caller information for the next feature that touches crm.py.
+Schema agent adds an index. Backend agent implements the lookup service. Review agent runs the
+full suite, verifies the known-callers register. Spec agent updates architecture.md and
+user-guide.md. The feature shipped.
 
 ---
 
-## 9. Where It Still Fails
-
-This section is not marketing copy. The methodology has limits, and being honest about them is
-what makes the rest of the document credible.
+## 8. Where It Still Fails
 
 ### Standing-doc staleness is a hard problem
-The doc verification gate catches drift after a merge, but if architecture.md is wrong when step 2
-starts, the entire solution design is built on bad foundations. We've added a staleness check
-(the orchestrator compares last-updated dates against git history before reading), but this is
-a heuristic, not a guarantee. A document can be up-to-date and still wrong.
+The doc verification gate catches drift after a merge, but if architecture.md is wrong when
+step 2 starts, the entire solution design is built on bad foundations. We check last-updated
+dates against git history, but this is a heuristic, not a guarantee.
 
 ### The known-callers register is manually maintained
-It is the single most important field in the entire methodology — and it depends on humans and
-agents remembering to update it. The verify command cross-checks it against actual imports for
-Python projects, but this is a spot-check, not a full static analysis. For non-Python projects,
-the register is maintained entirely by discipline. One missed update and the system degrades
-back to silent-breakage territory.
+The verify command cross-checks it against actual imports for Python projects, but this is a
+spot-check. One missed update and the system degrades back to silent-breakage territory.
 
 ### The methodology costs upfront time
-A feature that takes two hours to build might take three with specification. The methodology
-earns that hour back in reduced debugging, fewer regressions, and better agent output — but the
-hour is still spent. For a single-file change that qualifies for the skip rubric, the overhead
-is minimal (one problem statement). For a multi-layer, multi-agent feature, the upfront cost is
-real and must be weighed against the downstream savings.
+A feature that takes two hours might take three with specification. The methodology earns that
+hour back in reduced debugging and fewer regressions — but the hour is still spent.
 
 ### The Architecture Advisor can't read your mind
-It asks good questions, but it can only ask about what it knows to check. If a project has
-undocumented tribal knowledge — "we always use UTC for timestamps, even though the DB stores
-local time" — the advisor won't catch it unless it's in the standing docs. The methodology
-amplifies what's written down; it can't amplify what isn't.
+It can only ask about what it knows to check. Undocumented tribal knowledge — "we always use
+UTC even though the DB stores local time" — won't be caught unless it's in the standing docs.
 
 ### Agent variance is real
-Different AI agents interpret the same prompt differently. The prompts in agents/prompts/ are
-designed to be specific and constraining, but they can't eliminate variance entirely. The
-review agent catches most divergence, but not all. This improves as models improve.
+Different AI agents interpret the same prompt differently. The prompts are designed to be
+specific and constraining, but they can't eliminate variance entirely.
 
-### It's designed for projects with a single team
-The methodology assumes one team working on one codebase. Multi-team, multi-repo setups with
-shared libraries across repositories would need the known-callers register to span project
-boundaries — something the current tooling doesn't support.
+### It's designed for single-team projects
+Multi-team, multi-repo setups with shared libraries across repositories would need the
+known-callers register to span project boundaries — not currently supported.
 
 ---
 
-## 10. Two Documents, Two Audiences
+## 9. Two Documents, Two Audiences
 
-This PDF is for humans. It explains why the methodology exists, how it works at a conceptual
-level, and what you need to know to evaluate or adopt it.
+This document (PDF/Markdown) is for humans. It explains why the methodology exists, how it
+works at a conceptual level, and how to get started.
 
 `METHODOLOGY.md` is for AI agents. It is the operational reference: what goes in every template
 section, what makes a good problem statement, the exact format of interface contracts, the skip
-rubric criteria, the amendment path, the verification gate. It is 12KB of dense, structured
+rubric criteria, the amendment path, the verification gate. 12KB of dense, structured
 reference — the document an agent reads when it needs to know "what goes under this heading?"
 
-The split is intentional. A human doesn't need to know the exact table structure of the failure
-modes section. An agent doesn't need the persuasive argument for why the methodology exists.
-Each document serves its audience without compromise.
+The split is intentional. A human doesn't need the exact table structure of the failure modes
+section. An agent doesn't need the persuasive argument for why the methodology exists. Each
+document serves its audience without compromise.
 
 ---
 
