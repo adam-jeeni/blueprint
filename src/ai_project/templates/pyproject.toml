@@ -1,0 +1,8 @@
+[project]
+name = "{{NAME}}"
+version = "0.1.0"
+description = "{{CONTEXT}}"
+requires-python = ">=3.12"
+
+[project.scripts]
+# Add console script entry points here
