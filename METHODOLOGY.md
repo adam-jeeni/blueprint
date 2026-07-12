@@ -37,28 +37,14 @@ Duplicate the statement block if the feature addresses more than one distinct pr
 **Problem:** What is wrong or missing? Describe the current state and why it falls short.
 Focus on the gap, not the fix.
 
-**Who has it / context:** Which user role or persona experiences this? In what situation?
-Be specific — "the operator onboarding a new tenant" is better than "admin users."
-
-**Why now:** What makes this urgent or high-priority? Link to business need, technical debt,
-or dependency from another feature. A feature without a "why now" is a feature that shouldn't
-be built yet.
-
-**UI outline:** If the feature has a user-facing surface, describe what the user sees and
-does — screens, controls, flows. Not wireframes; prose that an agent can reason about.
-If there is no UI surface, state that explicitly.
-
-**Data outline:** What data is involved? New entities, new fields on existing entities, or
-changes to existing field semantics. Reference `docs/data-dictionary.md` for existing entities.
-If no data model change, state that explicitly.
-
 **Success criteria:** Concrete, testable outcomes. "Done" means these are true. Each criterion
 must map to at least one test case in `4-test-spec.md`. Use EARS-style phrasing: "The system
 shall..." or "The user can..."
 
-**Non-goals:** What is explicitly out of scope for this feature. Prevents scope creep and
-gives the agent clear boundaries. The best non-goals are tempting inclusions that the human
-actively decided against.
+**Non-functional Requirements:** What constraints does this feature operate under? Covers
+explicit scope boundaries, platform limitations, performance requirements, security constraints,
+and anything the feature will NOT do. Prevents scope creep and gives the agent clear boundaries.
+The best entries are tempting inclusions that the human actively decided against.
 
 ---
 
@@ -73,6 +59,19 @@ implementation agents work from — be precise about interfaces, data shapes, an
 Which layers does this feature touch? Options: data (schema / migrations / repositories),
 backend (API / services / agents), frontend (UI / client). List them explicitly. This
 determines which implementation agents are deployed.
+
+### Section: Functional Overview
+
+What does the proposed solution do, at a high level? Describe the core functionality —
+the main capabilities, the key workflows, and how the pieces fit together. This is the
+"what" before the "how" of the interface contracts. Keep it to a few paragraphs; save
+the detail for the contracts and impact specs below.
+
+### Section: UI Outline
+
+If the feature has a user-facing surface, describe what the user sees and does — screens,
+controls, flows, commands. Not wireframes; prose that an agent can reason about. If there
+is no UI surface, state that explicitly.
 
 ### Section: Interface Contracts
 

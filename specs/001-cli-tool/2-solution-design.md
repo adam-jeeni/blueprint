@@ -15,6 +15,16 @@ inputs_consulted:
 ## Layers required
 CLI layer, core layer. No data layer — file system only. No frontend layer — CLI only.
 
+## Functional Overview
+
+## UI outline
+
+Command-line interface only. Four subcommands:
+- `blueprint init <name>` — scaffolds a greenfield project
+- `blueprint onboard` — scaffolds convention skeleton around existing code
+- `blueprint new-feature <name>` — copies template into numbered spec folder
+- `blueprint verify` — checks structure integrity and doc-code drift
+
 ## Interface contracts
 
 ### blueprint init

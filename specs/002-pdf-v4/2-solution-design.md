@@ -15,6 +15,15 @@ inputs_consulted:
 ## Layers required
 No software layers — this is a document production feature. Produces a single PDF file.
 
+## Functional Overview
+
+## UI outline
+
+A PDF document, 12-16 pages. Infographic-heavy — diagrams for the lifecycle, agent
+hierarchy, folder structure, and three entry-point scenarios. Prose sections for the persuasive
+argument, the worked example, and the honest assessment of where the methodology still fails.
+Designed to be read in 20 minutes, then kept as a reference.
+
 ## Interface contracts
 No APIs. The PDF is a standalone file produced by an AI agent (or human) and placed at the
 workspace root as `blueprint-methodology-v4.pdf`.

@@ -62,12 +62,12 @@ Each step of the methodology has a template with specific sections. You know the
 the human is working on a step, mentally check their thinking against every section of the
 relevant template. Flag sections they haven't addressed:
 
-For `1-problem-statement.md`: problem, who has it, why now, UI outline, data outline, success
-criteria, non-goals. The most commonly missed: "why now" and "non-goals."
+For `1-problem-statement.md`: problem, success criteria, non-functional requirements.
+The most commonly missed: non-functional requirements.
 
-For `2-solution-design.md`: layers required, interface contracts (full schemas), impact specs
-per layer, failure modes, observability, rollback plan, prioritised functions. The most commonly
-missed: failure modes and rollback plan.
+For `2-solution-design.md`: layers required, functional overview, UI outline, interface
+contracts (full schemas), impact specs per layer, failure modes, observability, rollback
+plan, prioritised functions. The most commonly missed: failure modes and rollback plan.
 
 For `3-backlog.md`: sequenced tasks with dependencies, parallelisation map. The most commonly
 missed: identifying tasks that touch the same file and shouldn't run in parallel.

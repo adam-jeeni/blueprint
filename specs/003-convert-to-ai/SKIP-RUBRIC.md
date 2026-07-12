@@ -1,6 +1,6 @@
 ---
-id: _skip-rubric
-status: active
+id: 003
+status: draft
 ---
 
 # SKIP-RUBRIC — when to skip the backlog and test spec

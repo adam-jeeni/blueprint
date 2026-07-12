@@ -2,44 +2,40 @@
 
 **Convention-over-configuration methodology for AI-human software development.**
 
-AI coding agents fail from underspecified prompts. Blueprint gives you a fixed project structure,
-a set of documents, and a defined lifecycle — so every agent that opens your project knows
-exactly what to do without being told.
+Blueprint gives you a fixed project structure, a set of documents, and a defined
+lifecycle — so every AI agent that opens your project knows exactly what to do
+without being told. No CLI, no build step, no package installation. Just open the
+project and start building.
 
 ## Quick start
 
-```bash
-git clone https://github.com/YOUR_USERNAME/blueprint.git
-cd blueprint
-python -m venv .venv && source .venv/bin/activate   # or .venv\Scripts\activate on Windows
-pip install -e .
-
-# Scaffold a new project
-blueprint init my-project --name "My App" --stack "python-3.12,fastapi" --context "B2B SaaS"
-
-# Or onboard an existing project
-cd my-existing-project
-blueprint onboard
-```
-
-Open the project with any AI agent — `AGENTS.md` routes it into the feature lifecycle.
+1. Open a fresh directory with your AI agent.
+2. Load the project initialization agent: `agents/prompts/project-init.md`
+3. The agent will assess your project state and scaffold the full Blueprint
+   convention structure, including backend and frontend scaffolding.
+4. Start a **fresh session** in the same directory. `AGENTS.md` will detect the
+   convention and route your agent into the standard feature lifecycle.
 
 ## What's inside
 
-| Command | Purpose |
+| File / directory | Purpose |
 |---|---|
-| `blueprint init` | Scaffold a greenfield project |
-| `blueprint onboard` | Scaffold convention around existing code |
-| `blueprint new-feature <name>` | Start a new feature from template |
-| `blueprint verify` | Check structure integrity and doc-code drift |
-
-## Documentation
-
-- **[blueprint-methodology-v4.md](blueprint-methodology-v4.md)** — The full guide: how it works, why it works, getting started, worked example, where it still fails. Read this first.
-- **[METHODOLOGY.md](METHODOLOGY.md)** — Agent reference: what goes in every template section. For AI agents, not humans.
-- **[AGENTS.md](AGENTS.md)** — Lifecycle engine. The first file every agent reads.
+| `AGENTS.md` | Lifecycle engine — the first file every agent reads |
+| `METHODOLOGY.md` | Agent reference — what goes in every template section |
+| `agents/prompts/` | Role prompts — orchestrator, schema, backend, frontend, etc. |
+| `docs/` | Standing documents — architecture, data dictionary, user guide |
+| `specs/` | Feature specs — problem statement through shipped code |
+| `backend/` | Python FastAPI service with Alembic migrations |
+| `frontend/` | TypeScript React service with Playwright E2E tests |
+| `docker/` | Per-service Dockerfiles for containerized development |
 
 ## Agent-agnostic
 
-Built to work with any AI coding agent. No tool-specific syntax in the prompts. The convention is
-encoded in the folder structure, not in configuration files.
+Built to work with any AI coding agent. No tool-specific syntax in the prompts.
+The convention is encoded in the folder structure, not in configuration files.
+
+## Documentation
+
+- **`blueprint-methodology-v4.md`** — Full human-readable guide: how it works, why it works, getting started, worked example.
+- **`METHODOLOGY.md`** — Agent reference: what goes in every template section. For AI agents, not humans.
+- **`AGENTS.md`** — Lifecycle engine. The first file every agent reads.
